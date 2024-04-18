@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ServersService } from '../../pages/servers/servers.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Params } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -12,6 +12,7 @@ export class EditServerComponent implements OnInit, OnDestroy {
   server: { id: number; name: string; status: string };
   serverName = '';
   serverStatus = '';
+  allowEdit = false;
 
   routeQueryParams: Subscription;
   routeFragments: Subscription;
@@ -22,9 +23,12 @@ export class EditServerComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.routeQueryParams = this.route.queryParams.subscribe(() => {
-      console.log(this.route.snapshot.queryParams);
-    });
+    this.routeQueryParams = this.route.queryParams.subscribe(
+      (params: Params) => {
+        console.log(this.route.snapshot.queryParams);
+        this.allowEdit = params['allowEdit'] === '1' ? true : false;
+      }
+    );
     this.routeFragments = this.route.fragment.subscribe(() => {
       console.log(this.route.snapshot.fragment);
     });
