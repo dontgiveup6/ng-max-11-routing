@@ -19,6 +19,15 @@ export class ServerComponent implements OnInit {
   ngOnInit() {
     this.route.params.subscribe((params: Params) => {
       this.server = this.serversService.getServer(Number(params['id']));
+
+      if (!this.server) {
+        this.router.navigate(['/not-found']);
+        this.server = {
+          id: -1,
+          name: 'noServe',
+          status: 'Inactive',
+        };
+      }
     });
   }
 
