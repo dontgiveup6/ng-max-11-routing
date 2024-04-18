@@ -6,8 +6,8 @@
         href="#"
         class="list-group-item"
         [routerLink]="['/servers', 5, 'edit']"
-        [queryParams]="{ allowEdit: '1' }"
-        fragment="loading"
+        [queryParams]="{ allowEdit: '1', allowDelete: '2' }"
+        fragment="loading&moreLoading"
       >
         {{ server.name }}
       </a>

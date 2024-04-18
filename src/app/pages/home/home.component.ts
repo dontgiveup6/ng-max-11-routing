@@ -11,8 +11,8 @@ export class HomeComponent {
 
   onLoadServers(id: number) {
     this.router.navigate(['/servers', id, 'edit'], {
-      queryParams: { allowEdit: '1' },
-      fragment: 'loading',
+      queryParams: { allowEdit: '1', allowDelete: '2' },
+      fragment: 'loading&moreLoading',
     });
   }
 }
