@@ -1,16 +1,20 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ServersService } from '../../pages/servers/servers.service';
 import { ActivatedRoute } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-edit-server',
   templateUrl: './edit-server.component.html',
   styleUrl: './edit-server.component.css',
 })
-export class EditServerComponent implements OnInit {
+export class EditServerComponent implements OnInit, OnDestroy {
   server: { id: number; name: string; status: string };
   serverName = '';
   serverStatus = '';
+
+  routeQueryParams: Subscription;
+  routeFragments: Subscription;
 
   constructor(
     private serversService: ServersService,
@@ -18,10 +22,10 @@ export class EditServerComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.route.queryParams.subscribe(() => {
+    this.routeQueryParams = this.route.queryParams.subscribe(() => {
       console.log(this.route.snapshot.queryParams);
     });
-    this.route.fragment.subscribe(() => {
+    this.routeFragments = this.route.fragment.subscribe(() => {
       console.log(this.route.snapshot.fragment);
     });
 
@@ -35,5 +39,10 @@ export class EditServerComponent implements OnInit {
       name: this.serverName,
       status: this.serverStatus,
     });
+  }
+
+  ngOnDestroy() {
+    this.routeQueryParams.unsubscribe();
+    this.routeFragments.unsubscribe();
   }
 }
