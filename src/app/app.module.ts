@@ -13,6 +13,7 @@ import { UsersComponent } from './pages/users/users.component';
 import { ServerComponent } from './components/server/server.component';
 import { EditServerComponent } from './components/edit-server/edit-server.component';
 import { UserComponent } from './components/user/user.component';
+import { PageNotFoundComponent } from './pages/page-not-found/page-not-found.component';
 
 const appRoutes: Routes = [
   {
@@ -29,7 +30,6 @@ const appRoutes: Routes = [
       },
     ],
   },
-
   {
     path: 'servers',
     component: ServersComponent,
@@ -44,6 +44,8 @@ const appRoutes: Routes = [
       },
     ],
   },
+  { path: 'not-found', component: PageNotFoundComponent },
+  { path: '**', redirectTo: '/not-found' },
 ];
 
 @NgModule({
@@ -55,6 +57,7 @@ const appRoutes: Routes = [
     ServerComponent,
     EditServerComponent,
     UserComponent,
+    PageNotFoundComponent,
   ],
   imports: [BrowserModule, FormsModule, RouterModule.forRoot(appRoutes)],
   providers: [provideClientHydration()],
