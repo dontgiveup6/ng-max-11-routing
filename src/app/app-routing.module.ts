@@ -7,6 +7,7 @@ import { HomeComponent } from './pages/home/home.component';
 import { PageNotFoundComponent } from './pages/page-not-found/page-not-found.component';
 import { ServersComponent } from './pages/servers/servers.component';
 import { UsersComponent } from './pages/users/users.component';
+import { IsAdminGuard } from './auth-guard.service';
 
 const appRoutes: Routes = [
   {
@@ -25,6 +26,7 @@ const appRoutes: Routes = [
   },
   {
     path: 'servers',
+    canActivate: [IsAdminGuard],
     component: ServersComponent,
     children: [
       {
