@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import {
   ActivatedRouteSnapshot,
+  CanActivateChildFn,
   CanActivateFn,
   Router,
   RouterStateSnapshot,
@@ -25,11 +26,25 @@ class AuthGuard {
       }
     });
   }
+
+  canActiveChild(
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot
+  ): Observable<boolean> | Promise<boolean> | boolean {
+    return this.canActive(route, state);
+  }
 }
 
-export const IsAdminGuard: CanActivateFn = (
+export const canActivate: CanActivateFn = (
   route: ActivatedRouteSnapshot,
   state: RouterStateSnapshot
 ): Observable<boolean> | Promise<boolean> | boolean => {
   return inject(AuthGuard).canActive(route, state);
+};
+
+export const canActivateChild: CanActivateChildFn = (
+  route: ActivatedRouteSnapshot,
+  state: RouterStateSnapshot
+): Observable<boolean> | Promise<boolean> | boolean => {
+  return inject(AuthGuard).canActiveChild(route, state);
 };

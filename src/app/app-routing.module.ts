@@ -7,7 +7,8 @@ import { HomeComponent } from './pages/home/home.component';
 import { PageNotFoundComponent } from './pages/page-not-found/page-not-found.component';
 import { ServersComponent } from './pages/servers/servers.component';
 import { UsersComponent } from './pages/users/users.component';
-import { IsAdminGuard } from './auth-guard.service';
+import { canActivate, canActivateChild } from './auth-guard.service';
+import { canDeactivate } from './components/edit-server/can-deactivate-guard.service';
 
 const appRoutes: Routes = [
   {
@@ -26,7 +27,8 @@ const appRoutes: Routes = [
   },
   {
     path: 'servers',
-    canActivate: [IsAdminGuard],
+    // canActivate: [canActivate],
+    canActivateChild: [canActivate, canActivateChild],
     component: ServersComponent,
     children: [
       {
@@ -36,6 +38,7 @@ const appRoutes: Routes = [
       {
         path: ':id/edit',
         component: EditServerComponent,
+        canDeactivate: [canDeactivate],
       },
     ],
   },

@@ -1,41 +1,68 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ServersService } from '../../pages/servers/servers.service';
-import { ActivatedRoute, Params } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { ActivatedRoute, Params, Router } from '@angular/router';
+import { Observable, Subscription } from 'rxjs';
+import { CanComponentDeactivate } from './can-deactivate-guard.service';
 
 @Component({
   selector: 'app-edit-server',
   templateUrl: './edit-server.component.html',
   styleUrl: './edit-server.component.css',
 })
-export class EditServerComponent implements OnInit, OnDestroy {
+export class EditServerComponent
+  implements OnInit, OnDestroy, CanComponentDeactivate
+{
   server: { id: number; name: string; status: string };
   serverName = '';
   serverStatus = '';
   allowEdit = false;
 
+  changesSaved: boolean = false;
+
   routeQueryParams: Subscription;
+  routeParams: Subscription;
   routeFragments: Subscription;
 
   constructor(
     private serversService: ServersService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router
   ) {}
 
   ngOnInit() {
     this.routeQueryParams = this.route.queryParams.subscribe(
       (params: Params) => {
         console.log(this.route.snapshot.queryParams);
-        this.allowEdit = params['allowEdit'] === '1' ? true : false;
+        this.allowEdit = true;
       }
     );
     this.routeFragments = this.route.fragment.subscribe(() => {
       console.log(this.route.snapshot.fragment);
     });
 
-    this.server = this.serversService.getServer(1);
-    this.serverName = this.server.name;
-    this.serverStatus = this.server.status;
+    this.routeParams = this.route.params.subscribe((params: Params) => {
+      console.log(params);
+      this.server = this.serversService.getServer(+params['id']);
+
+      if (!this.server) {
+        this.allowEdit = false;
+        this.router.navigate(['/not-found']);
+        this.server = {
+          id: -1,
+          name: '',
+          status: 'Inactive',
+        };
+      } else {
+        this.serverName = this.server.name;
+        this.serverStatus = this.server.status;
+      }
+    });
+  }
+
+  ngOnDestroy() {
+    this.routeQueryParams.unsubscribe();
+    this.routeFragments.unsubscribe();
+    this.routeParams.unsubscribe();
   }
 
   onUpdateServer() {
@@ -43,10 +70,23 @@ export class EditServerComponent implements OnInit, OnDestroy {
       name: this.serverName,
       status: this.serverStatus,
     });
+    this.changesSaved = true;
+    this.router.navigate(['../'], { relativeTo: this.route });
   }
 
-  ngOnDestroy() {
-    this.routeQueryParams.unsubscribe();
-    this.routeFragments.unsubscribe();
+  canDeactivate(): boolean | Observable<boolean> | Promise<boolean> {
+    if (!this.allowEdit) {
+      return true;
+    }
+
+    if (
+      (this.serverName !== this.server.name ||
+        this.serverStatus !== this.server.status) &&
+      !this.changesSaved
+    ) {
+      return confirm('Do you want to discard the changes?');
+    } else {
+      return true;
+    }
   }
 }

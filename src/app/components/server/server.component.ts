@@ -24,7 +24,7 @@ export class ServerComponent implements OnInit {
         this.router.navigate(['/not-found']);
         this.server = {
           id: -1,
-          name: 'noServe',
+          name: '',
           status: 'Inactive',
         };
       }
