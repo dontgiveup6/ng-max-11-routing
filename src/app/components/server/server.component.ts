@@ -1,13 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ServersService } from '../../pages/servers/servers.service';
-import { ActivatedRoute, Params, Router } from '@angular/router';
+import { ActivatedRoute, Data, Params, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-server',
   templateUrl: './server.component.html',
   styleUrl: './server.component.css',
 })
-export class ServerComponent implements OnInit {
+export class ServerComponent implements OnInit, OnDestroy {
   server: { id: number; name: string; status: string };
 
   constructor(
@@ -16,10 +17,11 @@ export class ServerComponent implements OnInit {
     private router: Router
   ) {}
 
-  ngOnInit() {
-    this.route.params.subscribe((params: Params) => {
-      this.server = this.serversService.getServer(Number(params['id']));
+  routeData: Subscription;
 
+  ngOnInit() {
+    this.routeData = this.route.data.subscribe((data: Data) => {
+      this.server = data['server'];
       if (!this.server) {
         this.router.navigate(['/not-found']);
         this.server = {
@@ -29,6 +31,22 @@ export class ServerComponent implements OnInit {
         };
       }
     });
+    // this.route.params.subscribe((params: Params) => {
+    //   this.server = this.serversService.getServer(Number(params['id']));
+
+    //   if (!this.server) {
+    //     this.router.navigate(['/not-found']);
+    //     this.server = {
+    //       id: -1,
+    //       name: '',
+    //       status: 'Inactive',
+    //     };
+    //   }
+    // });
+  }
+
+  ngOnDestroy() {
+    this.routeData.unsubscribe();
   }
 
   onEdit() {

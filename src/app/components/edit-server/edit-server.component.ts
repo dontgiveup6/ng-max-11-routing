@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ServersService } from '../../pages/servers/servers.service';
-import { ActivatedRoute, Params, Router } from '@angular/router';
+import { ActivatedRoute, Data, Params, Router } from '@angular/router';
 import { Observable, Subscription } from 'rxjs';
 import { CanComponentDeactivate } from './can-deactivate-guard.service';
 
@@ -20,7 +20,7 @@ export class EditServerComponent
   changesSaved: boolean = false;
 
   routeQueryParams: Subscription;
-  routeParams: Subscription;
+  routeData: Subscription;
   routeFragments: Subscription;
 
   constructor(
@@ -33,16 +33,15 @@ export class EditServerComponent
     this.routeQueryParams = this.route.queryParams.subscribe(
       (params: Params) => {
         console.log(this.route.snapshot.queryParams);
-        this.allowEdit = true;
+        this.allowEdit = params['allowEdit'] === '1' ? true : false;
       }
     );
     this.routeFragments = this.route.fragment.subscribe(() => {
       console.log(this.route.snapshot.fragment);
     });
 
-    this.routeParams = this.route.params.subscribe((params: Params) => {
-      console.log(params);
-      this.server = this.serversService.getServer(+params['id']);
+    this.routeData = this.route.data.subscribe((data: Data) => {
+      this.server = data['server'];
 
       if (!this.server) {
         this.allowEdit = false;
@@ -57,12 +56,30 @@ export class EditServerComponent
         this.serverStatus = this.server.status;
       }
     });
+
+    // this.routeParams = this.route.params.subscribe((params: Params) => {
+    //   console.log(params);
+    //   this.server = this.serversService.getServer(+params['id']);
+
+    //   if (!this.server) {
+    //     this.allowEdit = false;
+    //     this.router.navigate(['/not-found']);
+    //     this.server = {
+    //       id: -1,
+    //       name: '',
+    //       status: 'Inactive',
+    //     };
+    //   } else {
+    //     this.serverName = this.server.name;
+    //     this.serverStatus = this.server.status;
+    //   }
+    // });
   }
 
   ngOnDestroy() {
     this.routeQueryParams.unsubscribe();
     this.routeFragments.unsubscribe();
-    this.routeParams.unsubscribe();
+    this.routeData.unsubscribe();
   }
 
   onUpdateServer() {

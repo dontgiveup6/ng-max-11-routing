@@ -10,6 +10,7 @@ import { UsersComponent } from './pages/users/users.component';
 import { canActivate, canActivateChild } from './auth-guard.service';
 import { canDeactivate } from './components/edit-server/can-deactivate-guard.service';
 import { ErrorPageComponent } from './pages/error-page/error-page.component';
+import { resolve } from './components/server/server-resolver.service';
 
 const appRoutes: Routes = [
   {
@@ -35,11 +36,13 @@ const appRoutes: Routes = [
       {
         path: ':id',
         component: ServerComponent,
+        resolve: { server: resolve },
       },
       {
         path: ':id/edit',
         component: EditServerComponent,
         canDeactivate: [canDeactivate],
+        resolve: { server: resolve },
       },
     ],
   },
